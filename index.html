@@ -22,7 +22,6 @@
   --clr-accent: #00e676;
   --clr-accent2: #ff6b35;
   --clr-yellow: #ffd600;
-  --clr-red: #ff1744;
   --clr-text: #ffffff;
   --clr-muted: rgba(255,255,255,0.5);
   --timer-color: #00e676;
@@ -42,7 +41,7 @@ body {
 .page { display: none; min-height: 100vh; }
 .page.active { display: flex; flex-direction: column; }
 
-/* AUTH - بسيطة بدون تعقيد */
+/* AUTH - بسيطة بدون رسائل وهمية */
 #auth-page {
   background: radial-gradient(ellipse at 50% 0%, #1a2a1a 0%, var(--clr-bg) 60%);
   justify-content: center;
@@ -102,9 +101,8 @@ body {
   cursor: pointer;
 }
 .auth-msg { margin-top: 12px; font-size: 13px; text-align: center; display: none; }
-.auth-msg.error { display: block; background: rgba(255,23,68,0.12); color: #ff6b6b; }
 
-/* HOME */
+/* HOME مع إحصائيات حقيقية */
 #home-page { background: var(--clr-bg); }
 .home-header {
   display: flex;
@@ -149,25 +147,26 @@ body {
   margin-bottom: 16px;
   font-weight: 700;
 }
-.stats-row {
-  display: flex;
-  gap: 16px;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   margin-bottom: 32px;
 }
 .stat-card {
-  flex: 1;
   background: var(--clr-card);
   border: 1px solid var(--clr-border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 16px 8px;
   text-align: center;
 }
 .stat-num {
   font-family: 'Oswald', sans-serif;
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
   color: var(--clr-accent);
 }
+.stat-label { font-size: 12px; color: var(--clr-muted); margin-top: 4px; }
 .recent-item {
   background: var(--clr-card);
   border-radius: var(--radius-sm);
@@ -175,7 +174,6 @@ body {
   margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
-  font-family: 'Cairo', sans-serif;
 }
 
 /* SETUP */
@@ -217,7 +215,6 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  font-family: 'Cairo', sans-serif;
 }
 .p1-num { background: var(--clr-accent); color: #000; }
 .p2-num { background: var(--clr-accent2); color: #fff; }
@@ -234,7 +231,7 @@ body {
 }
 .level-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2,1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -245,7 +242,6 @@ body {
   padding: 16px;
   text-align: center;
   cursor: pointer;
-  font-family: 'Cairo', sans-serif;
 }
 .level-btn.selected { border-color: var(--clr-accent); background: rgba(0,230,118,0.1); }
 .level-time { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 600; color: var(--clr-accent); }
@@ -268,7 +264,6 @@ body {
   font-size: 24px;
   cursor: pointer;
   color: white;
-  font-family: 'Cairo', sans-serif;
 }
 .count-val { font-family: 'Oswald', sans-serif; font-size: 32px; min-width: 50px; text-align: center; }
 .start-game-btn {
@@ -284,7 +279,7 @@ body {
   color: #000;
 }
 
-/* GAME PAGE - خط موحد */
+/* GAME PAGE */
 #game-page { background: #070710; }
 .game-top {
   display: flex;
@@ -307,17 +302,12 @@ body {
   font-weight: 800;
   font-family: 'Cairo', sans-serif;
   color: var(--clr-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .ps-points {
   font-family: 'Oswald', sans-serif;
   font-size: 48px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 2px;
-  /* بدون glow/وهج */
   text-shadow: none;
 }
 .p1-score .ps-points { color: var(--clr-accent); }
@@ -331,7 +321,7 @@ body {
 }
 .round-num { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; }
 
-/* TIMER - مركز وكبير بدون وهج مبالغ فيه */
+/* TIMER */
 .timer-section {
   flex: 1;
   display: flex;
@@ -371,7 +361,6 @@ body {
   font-weight: 700;
   color: var(--timer-color);
   text-shadow: none;
-  letter-spacing: 2px;
 }
 .timer-countdown-overlay {
   position: absolute;
@@ -405,7 +394,6 @@ body {
   font-weight: 900;
   font-size: min(18vw, 70px);
   color: var(--clr-accent);
-  text-shadow: none;
   animation: pulse 1.4s infinite;
 }
 @keyframes pulse { 0%,100%{ opacity: 0.8; transform: scale(1); } 50%{ opacity: 1; transform: scale(1.03); } }
@@ -418,7 +406,6 @@ body {
   display: flex;
   gap: 12px;
   align-items: center;
-  font-family: 'Cairo', sans-serif;
 }
 .table-points-badge {
   background: var(--clr-yellow);
@@ -453,7 +440,7 @@ body {
 .btn-pause { background: #2c2c3a; color: white; }
 .btn-end { background: rgba(255,23,68,0.9); color: white; }
 
-/* WINNER MODAL - تصميم أنيق */
+/* WINNER MODAL */
 .winner-overlay {
   display: none;
   position: fixed;
@@ -548,33 +535,34 @@ body {
 </head>
 <body>
 
-<!-- AUTH simplified -->
+<!-- AUTH بدون رسائل وهمية -->
 <div class="page active" id="auth-page">
   <div class="auth-logo"><div class="logo-word">REFEREE</div></div>
   <div class="auth-box">
     <div class="auth-tabs"><button class="auth-tab active" onclick="switchTab('login')">دخول</button><button class="auth-tab" onclick="switchTab('register')">حساب جديد</button></div>
     <div id="login-form" class="auth-form active">
-      <input type="email" id="login-email" class="field-input" placeholder="البريد الإلكتروني">
-      <input type="password" id="login-pass" class="field-input" placeholder="كلمة المرور">
+      <input type="text" id="login-name" class="field-input" placeholder="اسم المستخدم">
       <button class="btn-primary" onclick="handleLogin()">دخول</button>
-      <div id="login-msg" class="auth-msg"></div>
     </div>
     <div id="register-form" class="auth-form">
-      <input type="text" id="reg-name" class="field-input" placeholder="الاسم">
-      <input type="email" id="reg-email" class="field-input" placeholder="البريد">
-      <input type="password" id="reg-pass" class="field-input" placeholder="كلمة المرور (8 أحرف)">
+      <input type="text" id="reg-name" class="field-input" placeholder="اسمك">
       <button class="btn-primary" onclick="handleRegister()">إنشاء حساب</button>
-      <div id="reg-msg" class="auth-msg"></div>
     </div>
   </div>
 </div>
 
-<!-- HOME (بدون احصائيات حقيقية، عرض وهمي بسيط) -->
+<!-- HOME مع إحصائيات -->
 <div class="page" id="home-page">
   <div class="home-header"><div class="home-logo">REFEREE</div><div class="user-avatar" onclick="logout()">R</div></div>
   <div class="home-content">
     <button class="quick-match-btn" onclick="showSetup()">⚽ مباراة جديدة ←</button>
-    <div class="section-title">آخر المباريات</div>
+    <div class="section-title">📊 إحصائياتي</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="statMatches">0</div><div class="stat-label">مباريات</div></div>
+      <div class="stat-card"><div class="stat-num" id="statWins">0</div><div class="stat-label">انتصارات</div></div>
+      <div class="stat-card"><div class="stat-num" id="statPoints">0</div><div class="stat-label">أكبر نقاط</div></div>
+    </div>
+    <div class="section-title">📋 آخر المباريات</div>
     <div id="recent-list" class="recent-list"><div class="recent-item">لا توجد مباريات بعد</div></div>
   </div>
 </div>
@@ -617,17 +605,12 @@ body {
   </div>
 </div>
 
-<!-- ROUND MODAL -->
+<!-- MODALS -->
 <div class="round-result-overlay" id="roundModal"><div class="rr-card"><div class="rr-pot" id="modalPot">2</div><div>كرت على الطاولة</div><button class="rr-btn rr-p1" id="modalP1Btn" onclick="selectWinner(1)">اللاعب الأول</button><button class="rr-btn rr-p2" id="modalP2Btn" onclick="selectWinner(2)">اللاعب الثاني</button><button class="rr-btn rr-none" onclick="selectWinner(0)">لا أحد</button></div></div>
-
-<!-- WINNER MODAL -->
 <div class="winner-overlay" id="winnerModal"><div class="winner-crown">🏆</div><div class="winner-title">الفائز</div><div class="winner-name" id="winnerName">—</div><div class="winner-score" id="winnerScore">0 - 0</div><div class="winner-buttons"><button class="winner-btn winner-btn-main" id="rematchBtn">🔁 مباراة جديدة</button><button class="winner-btn winner-btn-new" id="homeBtn">🏠 الرئيسية</button></div></div>
 
 <script>
-// ======================== لا توجد إحصائيات ولا Firebase حقيقي لتخزين data ========================
-// مجرد تطبيق محلي لإدارة المباريات مع أصوات وتعليقات عراقية
-
-// متغيرات اللعبة
+// ======================== نظام إدارة اللعبة بدون Firebase ========================
 let game = {
   p1: "لاعب 1",
   p2: "لاعب 2",
@@ -642,8 +625,66 @@ let game = {
 
 let timerRaf = null;
 let countdownInterval = null;
-let isPaused = false;
-let pausedRemaining = 0;
+
+// إحصائيات اللاعب الحالي (محلية)
+let playerStats = {
+  matches: 0,
+  wins: 0,
+  maxPoints: 0
+};
+
+let recentMatches = [];
+
+// ======================== تحميل وحفظ الإحصائيات محلياً ========================
+function loadStats() {
+  const saved = localStorage.getItem("referee_stats");
+  if(saved) {
+    try {
+      const st = JSON.parse(saved);
+      playerStats = st;
+    } catch(e) {}
+  }
+  updateStatsUI();
+  loadRecentMatches();
+}
+function saveStats() {
+  localStorage.setItem("referee_stats", JSON.stringify(playerStats));
+  updateStatsUI();
+}
+function updateStatsUI() {
+  document.getElementById('statMatches').innerText = playerStats.matches;
+  document.getElementById('statWins').innerText = playerStats.wins;
+  document.getElementById('statPoints').innerText = playerStats.maxPoints;
+}
+function loadRecentMatches() {
+  const rec = localStorage.getItem("referee_matches");
+  if(rec) recentMatches = JSON.parse(rec);
+  else recentMatches = [];
+  const container = document.getElementById('recent-list');
+  if(recentMatches.length === 0) { container.innerHTML = '<div class="recent-item">لا توجد مباريات بعد</div>'; return; }
+  container.innerHTML = '';
+  recentMatches.slice(0,5).forEach(m => {
+    const div = document.createElement('div'); div.className = 'recent-item';
+    div.innerHTML = `<span>${m.p1} vs ${m.p2}</span><span>${m.score}</span>`;
+    container.appendChild(div);
+  });
+}
+function addMatchToHistory(p1, p2, scoreStr, winnerName, winnerPoints) {
+  recentMatches.unshift({ p1, p2, score: scoreStr });
+  if(recentMatches.length > 10) recentMatches.pop();
+  localStorage.setItem("referee_matches", JSON.stringify(recentMatches));
+  loadRecentMatches();
+  // تحديث الإحصائيات
+  playerStats.matches++;
+  if(winnerName === getCurrentPlayerName()) playerStats.wins++;
+  if(winnerPoints > playerStats.maxPoints) playerStats.maxPoints = winnerPoints;
+  saveStats();
+}
+function getCurrentPlayerName() {
+  let name = localStorage.getItem("referee_user");
+  if(!name) name = "اللاعب";
+  return name;
+}
 
 // ======================== الأصوات والتعليقات العراقية ========================
 function playBeep() {
@@ -660,7 +701,8 @@ function iraqiCongrats(winnerName) {
     `🎉 مبروك ${winnerName}! أهو أنت الزلم! 💪`,
     `🔥 ${winnerName} فاز بالكيم! شو هلعب رهيب!`,
     `🏆 سلامات ${winnerName}! روح جيب كاسة الشاي 🍵`,
-    `⚡ يا سلام! ${winnerName} أبطال أوروبا جان ويهة`
+    `⚡ يا سلام! ${winnerName} أبطال أوروبا جان ويهة`,
+    `🃏 ${winnerName} أكل الكروت كلها! فدوة الك`
   ];
   const randomMsg = msgs[Math.floor(Math.random() * msgs.length)];
   const toast = document.createElement('div');
@@ -679,18 +721,17 @@ function iraqiCongrats(winnerName) {
   toast.style.fontSize = '18px';
   toast.style.zIndex = '300';
   toast.style.border = '1px solid gold';
-  toast.style.backdropFilter = 'blur(8px)';
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
 
-// ======================== وظائف التحكم ========================
+// ======================== دوال التحكم ========================
 function showPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function switchTab(t) { document.getElementById('login-form').classList.toggle('active', t==='login'); document.getElementById('register-form').classList.toggle('active', t==='register'); }
-function handleLogin() { alert("تسجيل الدخول وهمي - التطبيق لا يجمع إحصائيات"); showPage('home-page'); }
-function handleRegister() { alert("تم إنشاء حساب وهمي - بدون حفظ بيانات"); showPage('home-page'); }
+function handleLogin() { let name = document.getElementById('login-name').value.trim(); if(name) localStorage.setItem("referee_user", name); showHome(); }
+function handleRegister() { let name = document.getElementById('reg-name').value.trim(); if(name) localStorage.setItem("referee_user", name); showHome(); }
 function logout() { showPage('auth-page'); }
-function showHome() { stopTimer(); showPage('home-page'); }
+function showHome() { loadStats(); showPage('home-page'); }
 function showSetup() { showPage('setup-page'); document.getElementById('cardsTotal').innerText = game.totalCards; }
 function setLevel(sec, el) { document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); game.roundTime = sec; }
 function changeCards(delta) { let val = Math.max(10, Math.min(200, game.totalCards + delta)); game.totalCards = val; document.getElementById('cardsTotal').innerText = val; }
@@ -698,8 +739,7 @@ function changeCards(delta) { let val = Math.max(10, Math.min(200, game.totalCar
 function initGame() {
   game.p1 = document.getElementById('p1-name').value.trim() || 'لاعب 1';
   game.p2 = document.getElementById('p2-name').value.trim() || 'لاعب 2';
-  game.p1Score = 0;
-  game.p2Score = 0;
+  game.p1Score = 0; game.p2Score = 0;
   game.cardsLeft = game.totalCards;
   game.tableCards = 2;
   game.round = 1;
@@ -708,6 +748,7 @@ function initGame() {
   document.getElementById('startOverlay').classList.remove('hidden');
   document.getElementById('timerDisplay').style.display = 'none';
   document.getElementById('countdownOverlay').style.display = 'none';
+  if(timerRaf) cancelAnimationFrame(timerRaf);
 }
 
 function updateGameUI() {
@@ -784,57 +825,32 @@ function onTimerEnd() {
   document.getElementById('roundModal').classList.add('show');
 }
 
-function selectWinner(winner) {
-  document.getElementById('roundModal').classList.remove('show');
-  processWinner(winner);
-}
-
-function awardWinner(winner) {
-  if(document.getElementById('roundModal').classList.contains('show')) return;
-  processWinner(winner);
-}
+function selectWinner(winner) { document.getElementById('roundModal').classList.remove('show'); processWinner(winner); }
+function awardWinner(winner) { if(document.getElementById('roundModal').classList.contains('show')) return; processWinner(winner); }
 
 function processWinner(winner) {
-  if(winner === 1) {
-    game.p1Score += game.tableCards;
-    game.cardsLeft -= game.tableCards;
-    game.tableCards = 2;
-  } else if(winner === 2) {
-    game.p2Score += game.tableCards;
-    game.cardsLeft -= game.tableCards;
-    game.tableCards = 2;
-  } else {
-    let add = Math.min(2, game.cardsLeft);
-    game.tableCards += add;
-    game.cardsLeft -= add;
-  }
+  if(winner === 1) { game.p1Score += game.tableCards; game.cardsLeft -= game.tableCards; game.tableCards = 2; }
+  else if(winner === 2) { game.p2Score += game.tableCards; game.cardsLeft -= game.tableCards; game.tableCards = 2; }
+  else { let add = Math.min(2, game.cardsLeft); game.tableCards += add; game.cardsLeft -= add; }
   game.round++;
-  
-  // تحديث الواجهة
   updateGameUI();
   
-  // شرط انتهاء اللعبة: العدد المتبقي 0 وطاولة 0
-  if(game.cardsLeft <= 0 && game.tableCards <= 0) {
-    endMatch();
-    return;
-  }
-  if(game.cardsLeft < 0) game.cardsLeft = 0;
-  // إعادة عرض زر البداية للجولة التالية
-  document.getElementById('startOverlay').classList.remove('hidden');
-  document.getElementById('timerDisplay').style.display = 'none';
+  // الشروط: انتهاء الكروت
+  if(game.cardsLeft <= 0 && game.tableCards <= 0) endMatch();
+  else if(game.cardsLeft < 0) game.cardsLeft = 0;
+  else { document.getElementById('startOverlay').classList.remove('hidden'); document.getElementById('timerDisplay').style.display = 'none'; }
 }
 
-function forceEndGame() {
-  if(confirm("إنهاء المباراة الآن؟")) endMatch();
-}
+function forceEndGame() { if(confirm("إنهاء المباراة قبل انتهاء الكروت؟")) endMatch(); }
 
 function endMatch() {
   stopTimer();
   let winnerName = "";
   let isDraw = false;
-  if(game.p1Score > game.p2Score) winnerName = game.p1;
-  else if(game.p2Score > game.p1Score) winnerName = game.p2;
-  else { winnerName = "تعادل"; isDraw = true; }
+  let winnerPoints = 0;
+  if(game.p1Score > game.p2Score) { winnerName = game.p1; winnerPoints = game.p1Score; }
+  else if(game.p2Score > game.p1Score) { winnerName = game.p2; winnerPoints = game.p2Score; }
+  else { winnerName = "تعادل"; isDraw = true; winnerPoints = game.p1Score; }
   
   document.getElementById('winnerName').innerText = winnerName;
   document.getElementById('winnerScore').innerHTML = `${game.p1} ${game.p1Score}  -  ${game.p2Score} ${game.p2}`;
@@ -842,21 +858,13 @@ function endMatch() {
   playWinFanfare();
   if(!isDraw) iraqiCongrats(winnerName);
   
-  // إضافة إلى آخر المباريات (محلياً بدون حفظ)
-  const recentDiv = document.getElementById('recent-list');
-  const newMatch = document.createElement('div');
-  newMatch.className = 'recent-item';
-  newMatch.innerHTML = `<span>${game.p1} vs ${game.p2}</span><span>${game.p1Score}-${game.p2Score}</span>`;
-  if(recentDiv.firstChild) recentDiv.insertBefore(newMatch, recentDiv.firstChild);
-  else recentDiv.appendChild(newMatch);
-  if(recentDiv.children.length > 5) recentDiv.removeChild(recentDiv.lastChild);
+  // حفظ الإحصائيات
+  addMatchToHistory(game.p1, game.p2, `${game.p1Score}-${game.p2Score}`, winnerName, winnerPoints);
 }
 
-// أزرار إعادة المباراة والرئيسية
 document.getElementById('rematchBtn').onclick = () => {
   document.getElementById('winnerModal').classList.remove('show');
-  game.p1Score = 0;
-  game.p2Score = 0;
+  game.p1Score = 0; game.p2Score = 0;
   game.cardsLeft = game.totalCards;
   game.tableCards = 2;
   game.round = 1;
@@ -864,26 +872,21 @@ document.getElementById('rematchBtn').onclick = () => {
   document.getElementById('startOverlay').classList.remove('hidden');
   document.getElementById('timerDisplay').style.display = 'none';
 };
-document.getElementById('homeBtn').onclick = () => {
-  document.getElementById('winnerModal').classList.remove('show');
-  showHome();
-};
+document.getElementById('homeBtn').onclick = () => { document.getElementById('winnerModal').classList.remove('show'); showHome(); };
 
 function pauseGame() {
   if(timerRaf) {
     cancelAnimationFrame(timerRaf);
     timerRaf = null;
-    isPaused = true;
-    pausedRemaining = parseInt(document.getElementById('timerDisplay').innerText);
+    let remaining = parseInt(document.getElementById('timerDisplay').innerText);
     document.getElementById('pauseBtn').innerText = '▶ متابعة';
-    document.getElementById('pauseBtn').onclick = resumeGame;
+    document.getElementById('pauseBtn').onclick = () => resumeGame(remaining);
   }
 }
-function resumeGame() {
-  isPaused = false;
+function resumeGame(remainingVal) {
   document.getElementById('pauseBtn').innerText = '⏸ إيقاف';
   document.getElementById('pauseBtn').onclick = pauseGame;
-  let remaining = pausedRemaining;
+  let remaining = remainingVal;
   const total = game.roundTime;
   const ring = document.getElementById('timerRing');
   const displaySpan = document.getElementById('timerDisplay');
@@ -911,8 +914,8 @@ function resumeGame() {
   timerRaf = requestAnimationFrame(tick);
 }
 
-// افتتاحية
-document.getElementById('cardsTotal').innerText = '40';
+// تحميل الإحصائيات عند بدء التطبيق
+loadStats();
 </script>
 </body>
 </html>
