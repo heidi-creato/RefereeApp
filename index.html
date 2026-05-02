@@ -563,6 +563,48 @@ html, body {
   display: none;
 }
 
+/* START overlay inside timer ring */
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+  transition: opacity 0.4s ease;
+}
+.start-overlay.hidden { opacity: 0; pointer-events: none; }
+.start-word {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: min(18vw, 80px);
+  letter-spacing: 6px;
+  color: var(--clr-accent);
+  line-height: 1;
+  text-shadow: 0 0 50px rgba(0,230,118,0.6), 0 0 100px rgba(0,230,118,0.2);
+  animation: startPulse 1.8s ease-in-out infinite;
+}
+.start-tap {
+  font-size: 13px;
+  color: var(--clr-muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  animation: startPulse 1.8s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+@keyframes startPulse {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+/* Smooth timer ring transition */
+.timer-progress-circle {
+  transition: stroke-dashoffset 0.95s linear, stroke 0.6s ease !important;
+}
+
 .cards-on-table {
   margin-top: 14px;
   display: flex;
@@ -990,13 +1032,18 @@ html, body {
   </div>
 
   <div class="timer-section">
-    <div class="timer-ring-container">
+    <div class="timer-ring-container" id="timer-ring-container">
       <svg class="timer-svg" id="timer-svg" viewBox="0 0 100 100">
         <circle class="timer-bg-circle" cx="50" cy="50" r="44"/>
         <circle class="timer-progress-circle" id="timer-ring" cx="50" cy="50" r="44"
           stroke-dasharray="276.46" stroke-dashoffset="0"/>
       </svg>
-      <div class="timer-display" id="timer-display">--</div>
+      <!-- START overlay -->
+      <div class="start-overlay" id="start-overlay" onclick="beginRound()">
+        <div class="start-word">ابدأ</div>
+        <div class="start-tap">اضغط للبدء</div>
+      </div>
+      <div class="timer-display" id="timer-display" style="display:none">--</div>
       <div class="timer-countdown-overlay" id="countdown-display"></div>
     </div>
     <div class="cards-on-table">
@@ -1004,16 +1051,12 @@ html, body {
       <div class="table-points-badge" id="table-pts-badge">2</div>
       <span style="color:var(--clr-muted);font-size:13px">نقطة</span>
     </div>
+    <!-- pause button below timer -->
+    <div id="ctrl-running-area" style="margin-top:18px;display:none">
+      <button class="ctrl-btn btn-pause" id="pause-btn" onclick="pauseGame()" style="width:160px;margin:0 auto;display:block">⏸ إيقاف مؤقت</button>
+    </div>
   </div>
 
-  <div class="game-controls" id="game-controls">
-    <div id="ctrl-pre-start">
-      <button class="ctrl-btn btn-start" onclick="beginRound()">▶ ابدأ الجولة</button>
-    </div>
-    <div id="ctrl-running" style="display:none">
-      <button class="ctrl-btn btn-pause" onclick="pauseGame()">⏸ إيقاف مؤقت</button>
-    </div>
-  </div>
 </div>
 
 <!-- LEADERBOARD -->
@@ -1375,18 +1418,26 @@ function renderGame() {
   document.getElementById('round-num').textContent = gameState.round;
   document.getElementById('table-cards-info').textContent = '🃏 ' + gameState.tableCards + ' على الطاولة';
   document.getElementById('table-pts-badge').textContent = gameState.tableCards;
-  document.getElementById('timer-display').textContent = gameState.roundTime;
   document.getElementById('rr-p1-btn').textContent = '🟢 ' + gameState.p1Name;
   document.getElementById('rr-p2-btn').textContent = '🟠 ' + gameState.p2Name;
+  // reset ring smoothly
+  const ring = document.getElementById('timer-ring');
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = '0';
+  setTimeout(() => { ring.style.transition = ''; }, 50);
   setTimerColor(gameState.roundTime, gameState.roundTime);
-  document.getElementById('timer-ring').style.strokeDashoffset = '0';
-  document.getElementById('ctrl-pre-start').style.display = 'block';
-  document.getElementById('ctrl-running').style.display = 'none';
+  // show start overlay, hide timer number
+  document.getElementById('start-overlay').classList.remove('hidden');
+  document.getElementById('timer-display').style.display = 'none';
+  document.getElementById('countdown-display').style.display = 'none';
+  document.getElementById('ctrl-running-area').style.display = 'none';
+  // remaining cards info
+  document.getElementById('table-cards-info').textContent = '🃏 ' + gameState.tableCards + ' | متبقٍ: ' + gameState.cardsRemaining;
 }
 
 window.beginRound = function() {
-  document.getElementById('ctrl-pre-start').style.display = 'none';
-  document.getElementById('ctrl-running').style.display = 'block';
+  document.getElementById('start-overlay').classList.add('hidden');
+  document.getElementById('ctrl-running-area').style.display = 'block';
   runCountdown(3, () => startTimer());
 };
 
@@ -1396,7 +1447,7 @@ function runCountdown(n, callback) {
   el.style.display = 'flex';
   timerEl.style.display = 'none';
   el.textContent = n;
-  playBeep(800, 0.1);
+  playCountdownTick();
   countdownInterval = setInterval(() => {
     n--;
     if (n <= 0) {
@@ -1406,7 +1457,7 @@ function runCountdown(n, callback) {
       callback();
     } else {
       el.textContent = n;
-      playBeep(800, 0.1);
+      playCountdownTick();
     }
   }, 1000);
 }
@@ -1417,17 +1468,34 @@ function startTimer() {
   const circumference = 276.46;
   const ring = document.getElementById('timer-ring');
   const display = document.getElementById('timer-display');
+  const startTime = performance.now();
+
   updateTimerDisplay(timerLeft, total);
-  timerInterval = setInterval(() => {
-    timerLeft--;
-    updateTimerDisplay(timerLeft, total);
-    const offset = circumference * (1 - timerLeft / total);
+  ring.style.strokeDashoffset = '0';
+
+  function tick(now) {
+    const elapsed = (now - startTime) / 1000;
+    const remaining = Math.max(0, total - elapsed);
+    const offset = circumference * (1 - remaining / total);
+
     ring.style.strokeDashoffset = offset;
-    if (timerLeft <= 0) {
-      clearInterval(timerInterval);
-      onTimeUp();
+
+    // update number only when integer changes
+    const secLeft = Math.ceil(remaining);
+    if (parseInt(display.textContent) !== secLeft) {
+      display.textContent = secLeft;
+      setTimerColor(secLeft, total);
     }
-  }, 1000);
+
+    if (remaining <= 0) {
+      display.textContent = '0';
+      ring.style.strokeDashoffset = circumference;
+      onTimeUp();
+      return;
+    }
+    timerInterval = requestAnimationFrame(tick);
+  }
+  timerInterval = requestAnimationFrame(tick);
 }
 
 function updateTimerDisplay(t, total) {
@@ -1446,7 +1514,8 @@ function setTimerColor(t, total) {
 }
 
 function stopTimer() {
-  clearInterval(timerInterval);
+  cancelAnimationFrame(timerInterval);
+  timerInterval = null;
   clearInterval(countdownInterval);
 }
 
@@ -1456,29 +1525,51 @@ function onTimeUp() {
   showRoundResult();
 }
 
+let pausedAt = 0;
+let pausedRemaining = 0;
+
 window.pauseGame = function() {
   if (timerInterval) {
-    clearInterval(timerInterval);
+    cancelAnimationFrame(timerInterval);
     timerInterval = null;
-    document.getElementById('ctrl-running').innerHTML = '<button class="ctrl-btn btn-start" onclick="resumeGame()">▶ متابعة</button>';
+    pausedRemaining = parseFloat(document.getElementById('timer-display').textContent) || timerLeft;
+    const btn = document.getElementById('pause-btn');
+    btn.textContent = '▶ متابعة';
+    btn.onclick = resumeGame;
   }
 };
 
 window.resumeGame = function() {
-  document.getElementById('ctrl-running').innerHTML = '<button class="ctrl-btn btn-pause" onclick="pauseGame()">⏸ إيقاف مؤقت</button>';
+  const btn = document.getElementById('pause-btn');
+  btn.textContent = '⏸ إيقاف مؤقت';
+  btn.onclick = pauseGame;
+
   const total = gameState.roundTime;
   const circumference = 276.46;
   const ring = document.getElementById('timer-ring');
-  timerInterval = setInterval(() => {
-    timerLeft--;
-    updateTimerDisplay(timerLeft, total);
-    const offset = circumference * (1 - timerLeft / total);
+  const display = document.getElementById('timer-display');
+  const remaining = pausedRemaining;
+  const resumeTime = performance.now();
+
+  function tick(now) {
+    const elapsed = (now - resumeTime) / 1000;
+    const left = Math.max(0, remaining - elapsed);
+    const offset = circumference * (1 - left / total);
     ring.style.strokeDashoffset = offset;
-    if (timerLeft <= 0) {
-      clearInterval(timerInterval);
-      onTimeUp();
+    const secLeft = Math.ceil(left);
+    if (parseInt(display.textContent) !== secLeft) {
+      display.textContent = secLeft;
+      setTimerColor(secLeft, total);
     }
-  }, 1000);
+    if (left <= 0) {
+      display.textContent = '0';
+      ring.style.strokeDashoffset = circumference;
+      onTimeUp();
+      return;
+    }
+    timerInterval = requestAnimationFrame(tick);
+  }
+  timerInterval = requestAnimationFrame(tick);
 };
 
 function showRoundResult() {
@@ -1488,6 +1579,7 @@ function showRoundResult() {
 
 window.awardRound = async function(winner) {
   document.getElementById('round-result-overlay').classList.remove('show');
+
   if (winner === 1) {
     gameState.p1Points += gameState.tableCards;
     gameState.cardsRemaining -= gameState.tableCards;
@@ -1497,17 +1589,31 @@ window.awardRound = async function(winner) {
     gameState.cardsRemaining -= gameState.tableCards;
     gameState.tableCards = 2;
   } else {
-    gameState.tableCards += 2;
-    gameState.cardsRemaining -= 2;
+    // لا أحد: أضف كرتين للطاولة من الكروت المتبقية
+    const add = Math.min(2, gameState.cardsRemaining);
+    gameState.tableCards += add;
+    gameState.cardsRemaining -= add;
   }
+
   gameState.round++;
-  if (gameState.cardsRemaining <= 0) {
+
+  // انتهت الكروت كلها → أنهِ المباراة
+  if (gameState.cardsRemaining <= 0 && gameState.tableCards <= 0) {
     await endGame();
     return;
   }
+
+  // إذا لم تبقَ كروت كافية لجولة جديدة (2 كرت) لكن ما زال هناك كروت على الطاولة
+  // أكمل الجولة الحالية حتى تُحسم ثم أنهِ
+  if (gameState.cardsRemaining < 0) gameState.cardsRemaining = 0;
+
+  // إذا انتهت الكروت تماماً بعد هذه الجولة (لا كروت على الطاولة ولا متبقية)
+  if (gameState.cardsRemaining === 0 && gameState.tableCards === 0) {
+    await endGame();
+    return;
+  }
+
   renderGame();
-  document.getElementById('ctrl-pre-start').style.display = 'block';
-  document.getElementById('ctrl-running').style.display = 'none';
 };
 
 async function endGame() {
@@ -1521,6 +1627,7 @@ async function endGame() {
   document.getElementById('winner-name').textContent = winnerName;
   document.getElementById('winner-score-line').textContent = `${gameState.p1Name}: ${p1}  •  ${gameState.p2Name}: ${p2}`;
   document.getElementById('winner-overlay').classList.add('show');
+  if (!draw) playWinSound();
   await saveMatch(winnerName, draw);
 }
 
@@ -1546,6 +1653,7 @@ async function saveMatch(winnerName, draw) {
 }
 
 window.rematch = function() {
+  stopTimer();
   gameState.p1Points = 0;
   gameState.p2Points = 0;
   gameState.round = 1;
@@ -1587,37 +1695,75 @@ window.showLeaderboard = async function() {
   }
 };
 
-// ── AUDIO ──
+// ── AUDIO – أصوات هادئة واحترافية ──
 let audioCtx = null;
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
-function playBeep(freq, duration) {
+
+// نغمة عداد هادئة (ding خفيف)
+function playCountdownTick() {
   try {
     const ctx = getAudio();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-    osc.start(); osc.stop(ctx.currentTime + duration);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(520, ctx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.2);
   } catch(e) {}
 }
+
+// صافرة ناعمة – نهاية الجولة
 function playWhistle() {
   try {
     const ctx = getAudio();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(1200, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(1800, ctx.currentTime + 0.1);
-    osc.frequency.linearRampToValueAtTime(1500, ctx.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.4, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    osc.start(); osc.stop(ctx.currentTime + 0.5);
+    const t = ctx.currentTime;
+
+    // نغمة أولى
+    const o1 = ctx.createOscillator();
+    const g1 = ctx.createGain();
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(880, t);
+    o1.frequency.linearRampToValueAtTime(1040, t + 0.15);
+    g1.gain.setValueAtTime(0.25, t);
+    g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    o1.start(t); o1.stop(t + 0.35);
+
+    // نغمة ثانية بعد 0.2s
+    const o2 = ctx.createOscillator();
+    const g2 = ctx.createGain();
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.type = 'sine';
+    o2.frequency.setValueAtTime(1040, t + 0.22);
+    o2.frequency.linearRampToValueAtTime(880, t + 0.45);
+    g2.gain.setValueAtTime(0.2, t + 0.22);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+    o2.start(t + 0.22); o2.stop(t + 0.5);
+  } catch(e) {}
+}
+
+// نغمة فوز احتفالية ناعمة
+function playWinSound() {
+  try {
+    const ctx = getAudio();
+    const t = ctx.currentTime;
+    [[523,0],[659,0.15],[784,0.3],[1047,0.5]].forEach(([freq, delay]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.2, t + delay);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.4);
+      o.start(t + delay); o.stop(t + delay + 0.4);
+    });
   } catch(e) {}
 }
 
