@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>REFEREE – مدير مباريات الكروت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --clr-bg: #0a0a0f;
+  --clr-surface: #12121a;
+  --clr-card: #1a1a26;
+  --clr-border: rgba(255,255,255,0.08);
+  --clr-accent: #00e676;
+  --clr-accent2: #ff6b35;
+  --clr-yellow: #ffd600;
+  --clr-red: #ff1744;
+  --clr-blue: #2979ff;
+  --clr-text: #ffffff;
+  --clr-muted: rgba(255,255,255,0.45);
+  --clr-green: #00c853;
+  --clr-orange: #ff6d00;
+  --timer-color: #00e676;
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  font-family: 'Cairo', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── PAGES ── */
+.page { display: none; min-height: 100vh; }
+.page.active { display: flex; flex-direction: column; }
+
+/* ── AUTH ── */
+#auth-page {
+  background: radial-gradient(ellipse at 50% 0%, #1a2a1a 0%, var(--clr-bg) 60%);
+  justify-content: center; align-items: center;
+  padding: 24px;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.auth-logo .logo-word {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 64px;
+  letter-spacing: 8px;
+  color: var(--clr-accent);
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(0,230,118,0.3);
+}
+.auth-logo .logo-sub {
+  font-size: 13px;
+  color: var(--clr-muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.auth-tabs {
+  display: flex;
+  background: var(--clr-card);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--clr-border);
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--clr-muted);
+  border: none;
+  background: transparent;
+}
+.auth-tab.active {
+  background: var(--clr-accent);
+  color: #000;
+}
+
+.auth-box {
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+
+.field-group { margin-bottom: 16px; }
+.field-label {
+  font-size: 12px;
+  color: var(--clr-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
+}
+.field-input {
+  width: 100%;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  color: var(--clr-text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  transition: border-color 0.2s;
+  outline: none;
+  direction: ltr;
+}
+.field-input:focus { border-color: var(--clr-accent); }
+.field-input[dir="rtl"] { direction: rtl; }
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--clr-accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-google {
+  width: 100%;
+  padding: 14px;
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-google:hover { border-color: rgba(255,255,255,0.3); }
+.btn-google svg { width: 20px; height: 20px; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--clr-muted);
+  font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--clr-border);
+}
+
+.forgot-link {
+  text-align: left;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--clr-accent);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Cairo', sans-serif;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 14px;
+  color: var(--clr-muted);
+}
+.remember-row input[type="checkbox"] { accent-color: var(--clr-accent); width: 16px; height: 16px; }
+
+.auth-msg {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  text-align: center;
+  display: none;
+}
+.auth-msg.error { background: rgba(255,23,68,0.12); color: #ff6b6b; border: 1px solid rgba(255,23,68,0.2); display: block; }
+.auth-msg.success { background: rgba(0,230,118,0.12); color: var(--clr-accent); border: 1px solid rgba(0,230,118,0.2); display: block; }
+.auth-msg.info { background: rgba(41,121,255,0.12); color: #7ab3ff; border: 1px solid rgba(41,121,255,0.2); display: block; }
+
+/* ── VERIFY EMAIL ── */
+#verify-page {
+  background: radial-gradient(ellipse at 50% 0%, #1a2a1a 0%, var(--clr-bg) 60%);
+  justify-content: center; align-items: center;
+  padding: 24px; text-align: center;
+}
+.verify-icon { font-size: 64px; margin-bottom: 24px; }
+.verify-title { font-size: 24px; font-weight: 900; margin-bottom: 12px; }
+.verify-sub { color: var(--clr-muted); font-size: 15px; line-height: 1.8; margin-bottom: 32px; }
+.verify-email-display { color: var(--clr-accent); font-weight: 700; font-size: 16px; margin: 8px 0; }
+.btn-secondary {
+  padding: 14px 24px;
+  background: transparent;
+  color: var(--clr-accent);
+  border: 1px solid var(--clr-accent);
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 320px;
+}
+.btn-secondary:hover { background: rgba(0,230,118,0.08); }
+
+/* ── HOME ── */
+#home-page {
+  background: var(--clr-bg);
+  padding: 0;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--clr-border);
+}
+.home-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: var(--clr-accent);
+}
+.home-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--clr-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 900; color: #000;
+  cursor: pointer;
+}
+.home-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.greeting {
+  margin-bottom: 32px;
+}
+.greeting-hi { font-size: 14px; color: var(--clr-muted); }
+.greeting-name { font-size: 26px; font-weight: 900; margin-top: 2px; }
+
+.quick-match-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--clr-accent) 0%, #00c853 100%);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  transition: transform 0.15s;
+  letter-spacing: 1px;
+}
+.quick-match-btn:hover { transform: translateY(-2px); }
+.quick-match-btn .arrow { font-size: 24px; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--clr-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--clr-accent); }
+.stat-card-icon { font-size: 28px; margin-bottom: 8px; }
+.stat-card-num { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; color: var(--clr-accent); }
+.stat-card-label { font-size: 12px; color: var(--clr-muted); margin-top: 4px; }
+
+.recent-list { display: flex; flex-direction: column; gap: 10px; }
+.recent-item {
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.recent-players { font-size: 14px; font-weight: 700; }
+.recent-score { font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--clr-accent); }
+.recent-date { font-size: 12px; color: var(--clr-muted); }
+.no-games { color: var(--clr-muted); font-size: 14px; text-align: center; padding: 20px; }
+
+/* ── SETUP ── */
+#setup-page { background: var(--clr-bg); }
+.setup-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--clr-border);
+}
+.back-btn {
+  width: 38px; height: 38px;
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  color: var(--clr-text);
+}
+.setup-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 600; }
+
+.setup-content { flex: 1; overflow-y: auto; padding: 24px; }
+
+.setup-section { margin-bottom: 28px; }
+
+.player-inputs { display: flex; flex-direction: column; gap: 12px; }
+.player-input-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 4px 4px 14px;
+}
+.player-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900;
+  flex-shrink: 0;
+}
+.p1-num { background: var(--clr-accent); color: #000; }
+.p2-num { background: var(--clr-accent2); color: #fff; }
+.player-name-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--clr-text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  outline: none;
+  padding: 12px 0;
+  direction: rtl;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.level-btn {
+  background: var(--clr-card);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Cairo', sans-serif;
+}
+.level-btn.selected { border-color: var(--clr-accent); background: rgba(0,230,118,0.08); }
+.level-time { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; color: var(--clr-accent); }
+.level-name { font-size: 12px; color: var(--clr-muted); margin-top: 4px; }
+
+.cards-count-row {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.count-ctrl { display: flex; align-items: center; gap: 14px; margin-right: auto; }
+.count-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cairo', sans-serif;
+}
+.count-btn:hover { border-color: var(--clr-accent); }
+.count-val { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; min-width: 40px; text-align: center; }
+.count-label { font-size: 14px; font-weight: 700; }
+
+.start-game-btn {
+  width: 100%;
+  padding: 18px;
+  background: var(--clr-accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+  margin-top: 8px;
+}
+.start-game-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+/* ── GAME ── */
+#game-page { background: #070710; overflow: hidden; }
+
+.game-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 14px 18px;
+  gap: 12px;
+}
+.player-score-card {
+  flex: 1;
+  background: var(--clr-card);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.player-score-card.active { border-color: var(--clr-accent); box-shadow: 0 0 20px rgba(0,230,118,0.15); }
+.player-score-card.p2-active { border-color: var(--clr-accent2); box-shadow: 0 0 20px rgba(255,107,53,0.15); }
+.ps-name { font-size: 12px; font-weight: 700; color: var(--clr-muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ps-points { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 2px; line-height: 1; }
+.ps-cards { font-size: 11px; color: var(--clr-muted); margin-top: 2px; }
+.p1-score .ps-points { color: var(--clr-accent); }
+.p2-score .ps-points { color: var(--clr-accent2); }
+
+.round-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+.round-label { font-size: 10px; color: var(--clr-muted); text-transform: uppercase; letter-spacing: 1px; }
+.round-num { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; }
+.table-cards { font-size: 10px; color: var(--clr-yellow); margin-top: 4px; }
+
+/* TIMER */
+.timer-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+}
+
+.timer-ring-container {
+  position: relative;
+  width: min(64vw, 280px);
+  height: min(64vw, 280px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timer-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.timer-bg-circle { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 6; }
+.timer-progress-circle {
+  fill: none;
+  stroke: var(--timer-color);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s linear, stroke 0.3s;
+}
+.timer-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: min(22vw, 96px);
+  letter-spacing: 4px;
+  color: var(--timer-color);
+  line-height: 1;
+  text-shadow: 0 0 40px var(--timer-color);
+  transition: color 0.3s;
+  z-index: 1;
+}
+.timer-countdown-overlay {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: min(30vw, 130px);
+  letter-spacing: 4px;
+  color: var(--clr-yellow);
+  line-height: 1;
+  text-shadow: 0 0 60px var(--clr-yellow);
+  z-index: 1;
+  display: none;
+}
+
+.cards-on-table {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.table-points-badge {
+  background: var(--clr-yellow);
+  color: #000;
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.game-controls {
+  padding: 14px 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.control-row { display: flex; gap: 10px; }
+.ctrl-btn {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+.ctrl-btn:active { transform: scale(0.97); }
+.btn-p1 { background: var(--clr-accent); color: #000; }
+.btn-p2 { background: var(--clr-accent2); color: #fff; }
+.btn-no-one { background: var(--clr-card); color: var(--clr-muted); border: 1px solid var(--clr-border); }
+.btn-start { background: var(--clr-accent); color: #000; font-size: 18px; }
+.btn-pause { background: var(--clr-card); color: var(--clr-text); border: 1px solid var(--clr-border); }
+
+.winner-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.winner-overlay.show { display: flex; }
+.winner-crown { font-size: 80px; margin-bottom: 16px; }
+.winner-title { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 4px; color: var(--clr-yellow); margin-bottom: 8px; }
+.winner-name { font-size: 28px; font-weight: 900; color: var(--clr-text); margin-bottom: 4px; }
+.winner-score-line { font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--clr-accent); margin-bottom: 32px; }
+.winner-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
+.winner-btn {
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  border: none;
+  letter-spacing: 1px;
+}
+.winner-btn-main { background: var(--clr-accent); color: #000; }
+.winner-btn-new { background: var(--clr-card); color: var(--clr-text); border: 1px solid var(--clr-border); }
+
+/* ── ROUND RESULT ── */
+.round-result-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 99;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.round-result-overlay.show { display: flex; }
+.rr-question {
+  font-family: 'Oswald', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.rr-sub { font-size: 14px; color: var(--clr-muted); margin-bottom: 28px; }
+.rr-pot {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 72px;
+  color: var(--clr-yellow);
+  line-height: 1;
+  margin-bottom: 4px;
+  text-shadow: 0 0 30px rgba(255,214,0,0.4);
+}
+.rr-pot-label { font-size: 12px; color: var(--clr-muted); margin-bottom: 28px; text-transform: uppercase; letter-spacing: 2px; }
+.rr-buttons { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; }
+.rr-btn {
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  border: none;
+  letter-spacing: 0.5px;
+  transition: transform 0.1s;
+}
+.rr-btn:active { transform: scale(0.97); }
+.rr-p1 { background: var(--clr-accent); color: #000; }
+.rr-p2 { background: var(--clr-accent2); color: #fff; }
+.rr-none { background: var(--clr-card); color: var(--clr-muted); border: 1px solid var(--clr-border); font-size: 14px; }
+
+/* ── LEADERBOARD ── */
+#leaderboard-page { background: var(--clr-bg); }
+.lb-header { display: flex; align-items: center; gap: 14px; padding: 20px 24px; border-bottom: 1px solid var(--clr-border); }
+.lb-content { flex: 1; overflow-y: auto; padding: 24px; }
+.lb-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.lb-rank {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  min-width: 30px;
+  text-align: center;
+}
+.lb-rank.gold { color: var(--clr-yellow); }
+.lb-rank.silver { color: #aaa; }
+.lb-rank.bronze { color: #cd7f32; }
+.lb-info { flex: 1; }
+.lb-name { font-size: 15px; font-weight: 700; }
+.lb-stats { font-size: 12px; color: var(--clr-muted); margin-top: 2px; }
+.lb-pts { font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--clr-accent); font-weight: 700; }
+
+/* ── LOADING ── */
+#loading-page {
+  background: var(--clr-bg);
+  justify-content: center; align-items: center;
+}
+.loading-logo { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 8px; color: var(--clr-accent); }
+.loading-dots { display: flex; gap: 8px; margin-top: 20px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--clr-accent); opacity: 0.3; animation: dotPulse 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse { 0%,80%,100% { opacity: 0.3; } 40% { opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes timerPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+.fade-in { animation: fadeIn 0.3s ease; }
+.scale-in { animation: scaleIn 0.25s ease; }
+
+/* Landscape */
+@media (orientation: landscape) and (max-height: 500px) {
+  .game-top { padding: 8px 16px; }
+  .ps-points { font-size: 28px; }
+  .timer-ring-container { width: 44vw; height: 44vw; }
+  .timer-display { font-size: 18vw; }
+  .game-controls { padding: 8px 16px 16px; }
+  .ctrl-btn { padding: 12px; }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .auth-box { padding: 36px 32px; }
+  .timer-ring-container { width: 300px; height: 300px; }
+  .timer-display { font-size: 100px; }
+  .ps-points { font-size: 48px; }
+}
+
+/* Fullscreen */
+#game-page:fullscreen { background: #070710; }
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle; margin-left: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="page active" id="loading-page">
+  <div class="loading-logo">REFEREE</div>
+  <div class="loading-dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="page" id="auth-page">
+  <div class="auth-logo">
+    <div class="logo-word">REFEREE</div>
+    <div class="logo-sub">مدير مباريات الكروت</div>
+  </div>
+  <div class="auth-box fade-in">
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">حساب جديد</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-form active" id="form-login">
+      <div class="field-group">
+        <label class="field-label">البريد الإلكتروني</label>
+        <input type="email" class="field-input" id="login-email" placeholder="example@email.com" autocomplete="email">
+      </div>
+      <div class="field-group">
+        <label class="field-label">كلمة المرور</label>
+        <input type="password" class="field-input" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="remember-row">
+        <input type="checkbox" id="remember-me">
+        <label for="remember-me">تذكرني</label>
+      </div>
+      <button class="btn-primary" id="login-btn" onclick="doLogin()">دخول</button>
+      <div class="divider">أو</div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        المتابعة بـ Google
+      </button>
+      <div style="text-align:center">
+        <button class="forgot-link" onclick="switchAuthTab('forgot')">نسيت كلمة المرور؟</button>
+      </div>
+      <div class="auth-msg" id="login-msg"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="auth-form" id="form-register">
+      <div class="field-group">
+        <label class="field-label">الاسم</label>
+        <input type="text" class="field-input" id="reg-name" placeholder="اسمك" dir="rtl" autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">البريد الإلكتروني</label>
+        <input type="email" class="field-input" id="reg-email" placeholder="example@email.com" autocomplete="email">
+      </div>
+      <div class="field-group">
+        <label class="field-label">كلمة المرور</label>
+        <input type="password" class="field-input" id="reg-pass" placeholder="8 أحرف على الأقل" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" id="register-btn" onclick="doRegister()">إنشاء الحساب</button>
+      <div class="auth-msg" id="register-msg"></div>
+    </div>
+
+    <!-- FORGOT -->
+    <div class="auth-form" id="form-forgot">
+      <p style="color:var(--clr-muted);font-size:14px;margin-bottom:20px;text-align:center;line-height:1.8">
+        أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور
+      </p>
+      <div class="field-group">
+        <label class="field-label">البريد الإلكتروني</label>
+        <input type="email" class="field-input" id="forgot-email" placeholder="example@email.com">
+      </div>
+      <button class="btn-primary" onclick="doForgotPassword()">إرسال رابط الاسترداد</button>
+      <div style="text-align:center;margin-top:14px">
+        <button class="forgot-link" onclick="switchAuthTab('login')">← العودة لتسجيل الدخول</button>
+      </div>
+      <div class="auth-msg" id="forgot-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFY EMAIL -->
+<div class="page" id="verify-page">
+  <div class="scale-in" style="width:100%;max-width:380px">
+    <div class="verify-icon">📧</div>
+    <div class="verify-title">تحقق من بريدك الإلكتروني</div>
+    <div class="verify-sub">
+      أرسلنا رسالة تأكيد إلى:
+      <div class="verify-email-display" id="verify-email-display"></div>
+      يرجى فتح بريدك والضغط على رابط التأكيد قبل الدخول.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin:0 auto">
+      <button class="btn-primary" onclick="checkEmailVerified()">لقد قمت بالتأكيد ✓</button>
+      <button class="btn-secondary" onclick="resendVerification()">إعادة إرسال الرسالة</button>
+      <button class="btn-secondary" onclick="signOut()" style="border-color:rgba(255,255,255,0.2);color:var(--clr-muted)">تسجيل الخروج</button>
+    </div>
+    <div class="auth-msg" id="verify-msg" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page" id="home-page">
+  <div class="home-header">
+    <div class="home-logo">REFEREE</div>
+    <div class="home-user">
+      <div class="user-avatar" id="user-avatar" onclick="showUserMenu()">R</div>
+    </div>
+  </div>
+  <div class="home-content">
+    <div class="greeting fade-in">
+      <div class="greeting-hi">مرحباً 👋</div>
+      <div class="greeting-name" id="greeting-name">لاعب</div>
+    </div>
+    <button class="quick-match-btn" onclick="showSetup()">
+      <span>⚽ مباراة جديدة</span>
+      <span class="arrow">←</span>
+    </button>
+    <div class="section-title">إحصائياتك</div>
+    <div class="cards-grid fade-in">
+      <div class="stat-card">
+        <div class="stat-card-icon">🏆</div>
+        <div class="stat-card-num" id="stat-wins">0</div>
+        <div class="stat-card-label">انتصارات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🎮</div>
+        <div class="stat-card-num" id="stat-games">0</div>
+        <div class="stat-card-label">مباريات</div>
+      </div>
+      <div class="stat-card" onclick="showLeaderboard()">
+        <div class="stat-card-icon">🥇</div>
+        <div class="stat-card-num" id="stat-rank">—</div>
+        <div class="stat-card-label">ترتيبك</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">⚡</div>
+        <div class="stat-card-num" id="stat-points">0</div>
+        <div class="stat-card-label">مجموع النقاط</div>
+      </div>
+    </div>
+    <div class="section-title">آخر المباريات</div>
+    <div class="recent-list" id="recent-list">
+      <div class="no-games">لا توجد مباريات بعد</div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="page" id="setup-page">
+  <div class="setup-header">
+    <div class="back-btn" onclick="showHome()">←</div>
+    <div class="setup-title">إعداد المباراة</div>
+  </div>
+  <div class="setup-content">
+    <div class="setup-section">
+      <div class="section-title">أسماء اللاعبين</div>
+      <div class="player-inputs">
+        <div class="player-input-row">
+          <div class="player-num p1-num">1</div>
+          <input type="text" class="player-name-input" id="p1-name" placeholder="اسم اللاعب الأول" maxlength="20">
+        </div>
+        <div class="player-input-row">
+          <div class="player-num p2-num">2</div>
+          <input type="text" class="player-name-input" id="p2-name" placeholder="اسم اللاعب الثاني" maxlength="20">
+        </div>
+      </div>
+    </div>
+    <div class="setup-section">
+      <div class="section-title">مستوى الصعوبة</div>
+      <div class="level-grid">
+        <div class="level-btn" onclick="selectLevel(5, this)">
+          <div class="level-time">5</div>
+          <div class="level-name">ثواني – صعب جداً 🔥</div>
+        </div>
+        <div class="level-btn selected" onclick="selectLevel(10, this)">
+          <div class="level-time">10</div>
+          <div class="level-name">ثواني – صعب ⚡</div>
+        </div>
+        <div class="level-btn" onclick="selectLevel(15, this)">
+          <div class="level-time">15</div>
+          <div class="level-name">ثانية – متوسط 🎯</div>
+        </div>
+        <div class="level-btn" onclick="selectLevel(20, this)">
+          <div class="level-time">20</div>
+          <div class="level-name">ثانية – سهل 😊</div>
+        </div>
+      </div>
+    </div>
+    <div class="setup-section">
+      <div class="section-title">عدد الكروت الإجمالية</div>
+      <div class="cards-count-row">
+        <div class="count-label">كرت</div>
+        <div class="count-ctrl">
+          <button class="count-btn" onclick="changeCards(-10)">−</button>
+          <div class="count-val" id="cards-count-val">40</div>
+          <button class="count-btn" onclick="changeCards(10)">+</button>
+        </div>
+      </div>
+    </div>
+    <button class="start-game-btn" onclick="startGame()">🚀 ابدأ المباراة</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="page" id="game-page">
+  <div class="game-top">
+    <div class="player-score-card p1-score" id="p1-card">
+      <div class="ps-name" id="game-p1-name">لاعب 1</div>
+      <div class="ps-points" id="p1-pts">0</div>
+      <div class="ps-cards" id="p1-cards-won">0 كرت</div>
+    </div>
+    <div class="round-info">
+      <div class="round-label">جولة</div>
+      <div class="round-num" id="round-num">1</div>
+      <div class="table-cards" id="table-cards-info">🃏 2 على الطاولة</div>
+    </div>
+    <div class="player-score-card p2-score" id="p2-card">
+      <div class="ps-name" id="game-p2-name">لاعب 2</div>
+      <div class="ps-points" id="p2-pts">0</div>
+      <div class="ps-cards" id="p2-cards-won">0 كرت</div>
+    </div>
+  </div>
+
+  <div class="timer-section">
+    <div class="timer-ring-container">
+      <svg class="timer-svg" id="timer-svg" viewBox="0 0 100 100">
+        <circle class="timer-bg-circle" cx="50" cy="50" r="44"/>
+        <circle class="timer-progress-circle" id="timer-ring" cx="50" cy="50" r="44"
+          stroke-dasharray="276.46" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-display" id="timer-display">--</div>
+      <div class="timer-countdown-overlay" id="countdown-display"></div>
+    </div>
+    <div class="cards-on-table">
+      <span style="color:var(--clr-muted);font-size:13px">كروت الطاولة:</span>
+      <div class="table-points-badge" id="table-pts-badge">2</div>
+      <span style="color:var(--clr-muted);font-size:13px">نقطة</span>
+    </div>
+  </div>
+
+  <div class="game-controls" id="game-controls">
+    <div id="ctrl-pre-start">
+      <button class="ctrl-btn btn-start" onclick="beginRound()">▶ ابدأ الجولة</button>
+    </div>
+    <div id="ctrl-running" style="display:none">
+      <button class="ctrl-btn btn-pause" onclick="pauseGame()">⏸ إيقاف مؤقت</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="page" id="leaderboard-page">
+  <div class="lb-header">
+    <div class="back-btn" onclick="showHome()">←</div>
+    <div class="setup-title">🏆 سجل الأبطال</div>
+  </div>
+  <div class="lb-content" id="lb-content">
+    <div class="no-games">جار التحميل...</div>
+  </div>
+</div>
+
+<!-- ROUND RESULT OVERLAY -->
+<div class="round-result-overlay" id="round-result-overlay">
+  <div class="scale-in">
+    <div class="rr-question">📣 من الفائز بالجولة؟</div>
+    <div class="rr-sub">اختر اللاعب الذي أجاب بشكل صحيح</div>
+    <div class="rr-pot" id="rr-pot">2</div>
+    <div class="rr-pot-label">كرت على الطاولة</div>
+    <div class="rr-buttons">
+      <button class="rr-btn rr-p1" id="rr-p1-btn" onclick="awardRound(1)">🟢 اللاعب الأول</button>
+      <button class="rr-btn rr-p2" id="rr-p2-btn" onclick="awardRound(2)">🟠 اللاعب الثاني</button>
+      <button class="rr-btn rr-none" onclick="awardRound(0)">لا أحد – أضف كرتين</button>
+    </div>
+  </div>
+</div>
+
+<!-- WINNER OVERLAY -->
+<div class="winner-overlay" id="winner-overlay">
+  <div class="winner-crown">🏆</div>
+  <div class="winner-title">الفائز</div>
+  <div class="winner-name" id="winner-name">—</div>
+  <div class="winner-score-line" id="winner-score-line">—</div>
+  <div class="winner-actions">
+    <button class="winner-btn winner-btn-main" onclick="rematch()">🔁 مباراة بنفس اللاعبين</button>
+    <button class="winner-btn winner-btn-new" onclick="showHome()">🏠 الصفحة الرئيسية</button>
+  </div>
+</div>
+
+<!-- Firebase + App Logic -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendEmailVerification, sendPasswordResetEmail, GoogleAuthProvider,
+  signInWithPopup, onAuthStateChanged, signOut as fbSignOut,
+  browserLocalPersistence, browserSessionPersistence, setPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection,
+  addDoc, getDocs, orderBy, query, limit, serverTimestamp, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBfJU8NrKI7-GnQOj-e7AHETr9bJHbqI7s",
+  authDomain: "referee-c4ba2.firebaseapp.com",
+  projectId: "referee-c4ba2",
+  storageBucket: "referee-c4ba2.firebasestorage.app",
+  messagingSenderId: "409867345956",
+  appId: "1:409867345956:web:52f2f495778a37c3b9f8b1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+// ── STATE ──
+let currentUser = null;
+let gameState = {
+  p1Name: '', p2Name: '',
+  p1Points: 0, p2Points: 0,
+  roundTime: 10,
+  totalCards: 40,
+  cardsRemaining: 40,
+  tableCards: 2,
+  round: 1,
+  paused: false,
+  started: false
+};
+let timerInterval = null;
+let timerLeft = 0;
+let countdownInterval = null;
+
+// ── HELPERS ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function setMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'auth-msg ' + type;
+}
+function clearMsg(id) {
+  const el = document.getElementById(id);
+  el.className = 'auth-msg';
+  el.textContent = '';
+}
+
+// ── AUTH UI ──
+window.switchAuthTab = function(tab) {
+  ['login','register','forgot'].forEach(t => {
+    document.getElementById('form-' + t).classList.remove('active');
+  });
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('form-' + tab).classList.add('active');
+  if (tab === 'login') document.querySelectorAll('.auth-tab')[0].classList.add('active');
+  else if (tab === 'register') document.querySelectorAll('.auth-tab')[1].classList.add('active');
+};
+
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const remember = document.getElementById('remember-me').checked;
+  const btn = document.getElementById('login-btn');
+  if (!email || !pass) { setMsg('login-msg','يرجى ملء جميع الحقول','error'); return; }
+  btn.disabled = true;
+  btn.innerHTML = 'جار الدخول <span class="loading-spinner"></span>';
+  clearMsg('login-msg');
+  try {
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    if (!cred.user.emailVerified) {
+      document.getElementById('verify-email-display').textContent = cred.user.email;
+      showPage('verify-page');
+      btn.disabled = false; btn.textContent = 'دخول';
+      return;
+    }
+  } catch(e) {
+    setMsg('login-msg', getAuthError(e.code), 'error');
+  }
+  btn.disabled = false; btn.textContent = 'دخول';
+};
+
+window.doRegister = async function() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const btn = document.getElementById('register-btn');
+  if (!name || !email || !pass) { setMsg('register-msg','يرجى ملء جميع الحقول','error'); return; }
+  if (pass.length < 8) { setMsg('register-msg','كلمة المرور يجب أن تكون 8 أحرف على الأقل','error'); return; }
+  btn.disabled = true;
+  btn.innerHTML = 'جار الإنشاء <span class="loading-spinner"></span>';
+  clearMsg('register-msg');
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await sendEmailVerification(cred.user);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email, wins: 0, games: 0, totalPoints: 0, createdAt: serverTimestamp()
+    });
+    document.getElementById('verify-email-display').textContent = email;
+    showPage('verify-page');
+  } catch(e) {
+    setMsg('register-msg', getAuthError(e.code), 'error');
+  }
+  btn.disabled = false; btn.textContent = 'إنشاء الحساب';
+};
+
+window.doGoogleLogin = async function() {
+  try {
+    const cred = await signInWithPopup(auth, googleProvider);
+    const userRef = doc(db, 'users', cred.user.uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        name: cred.user.displayName || 'لاعب',
+        email: cred.user.email,
+        wins: 0, games: 0, totalPoints: 0,
+        createdAt: serverTimestamp()
+      });
+    }
+  } catch(e) {
+    setMsg('login-msg', getAuthError(e.code), 'error');
+  }
+};
+
+window.doForgotPassword = async function() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { setMsg('forgot-msg','أدخل بريدك الإلكتروني','error'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    setMsg('forgot-msg','تم إرسال رابط الاسترداد! تحقق من بريدك.','success');
+  } catch(e) {
+    setMsg('forgot-msg', getAuthError(e.code), 'error');
+  }
+};
+
+window.checkEmailVerified = async function() {
+  await auth.currentUser?.reload();
+  if (auth.currentUser?.emailVerified) {
+    loadHome();
+  } else {
+    const el = document.getElementById('verify-msg');
+    el.textContent = 'لم يتم التأكيد بعد، يرجى التحقق من بريدك.';
+    el.className = 'auth-msg error';
+  }
+};
+
+window.resendVerification = async function() {
+  try {
+    await sendEmailVerification(auth.currentUser);
+    const el = document.getElementById('verify-msg');
+    el.textContent = 'تم إعادة الإرسال! تحقق من بريدك.';
+    el.className = 'auth-msg success';
+  } catch(e) {}
+};
+
+window.signOut = async function() {
+  await fbSignOut(auth);
+  showPage('auth-page');
+};
+
+function getAuthError(code) {
+  const msgs = {
+    'auth/user-not-found': 'البريد الإلكتروني غير مسجل',
+    'auth/wrong-password': 'كلمة المرور غير صحيحة',
+    'auth/email-already-in-use': 'البريد الإلكتروني مستخدم بالفعل',
+    'auth/weak-password': 'كلمة المرور ضعيفة جداً',
+    'auth/invalid-email': 'البريد الإلكتروني غير صحيح',
+    'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً',
+    'auth/network-request-failed': 'خطأ في الاتصال بالإنترنت',
+    'auth/popup-closed-by-user': 'تم إلغاء تسجيل الدخول',
+    'auth/invalid-credential': 'البيانات غير صحيحة'
+  };
+  return msgs[code] || 'حدث خطأ، حاول مرة أخرى';
+}
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    if (!user.emailVerified && user.providerData[0]?.providerId === 'password') {
+      document.getElementById('verify-email-display').textContent = user.email;
+      showPage('verify-page');
+    } else {
+      await loadHome();
+    }
+  } else {
+    currentUser = null;
+    showPage('auth-page');
+  }
+});
+
+// ── HOME ──
+async function loadHome() {
+  showPage('home-page');
+  try {
+    const snap = await getDoc(doc(db, 'users', currentUser.uid));
+    if (snap.exists()) {
+      const d = snap.data();
+      const name = d.name || currentUser.displayName || 'لاعب';
+      document.getElementById('greeting-name').textContent = name;
+      const initial = name.charAt(0).toUpperCase();
+      document.getElementById('user-avatar').textContent = initial;
+      document.getElementById('stat-wins').textContent = d.wins || 0;
+      document.getElementById('stat-games').textContent = d.games || 0;
+      document.getElementById('stat-points').textContent = d.totalPoints || 0;
+    }
+    await loadRecentGames();
+    await loadUserRank();
+  } catch(e) {}
+}
+
+async function loadRecentGames() {
+  try {
+    const q = query(collection(db, 'users', currentUser.uid, 'matches'),
+      orderBy('createdAt','desc'), limit(5));
+    const snaps = await getDocs(q);
+    const list = document.getElementById('recent-list');
+    if (snaps.empty) { list.innerHTML = '<div class="no-games">لا توجد مباريات بعد</div>'; return; }
+    list.innerHTML = '';
+    snaps.forEach(d => {
+      const m = d.data();
+      const item = document.createElement('div');
+      item.className = 'recent-item';
+      item.innerHTML = `
+        <div>
+          <div class="recent-players">${m.p1Name} ضد ${m.p2Name}</div>
+          <div class="recent-date">${m.createdAt?.toDate ? m.createdAt.toDate().toLocaleDateString('ar') : ''}</div>
+        </div>
+        <div class="recent-score">${m.p1Points} – ${m.p2Points}</div>
+      `;
+      list.appendChild(item);
+    });
+  } catch(e) {}
+}
+
+async function loadUserRank() {
+  try {
+    const q = query(collection(db,'users'), orderBy('wins','desc'));
+    const snaps = await getDocs(q);
+    let rank = 1;
+    snaps.forEach((d,i) => {
+      if (d.id === currentUser.uid) {}
+    });
+    let r = 1;
+    for (const d of snaps.docs) {
+      if (d.id === currentUser.uid) break;
+      r++;
+    }
+    document.getElementById('stat-rank').textContent = '#' + r;
+  } catch(e) {}
+}
+
+window.showUserMenu = function() {
+  if (confirm('هل تريد تسجيل الخروج؟')) signOut();
+};
+
+// ── SETUP ──
+window.showSetup = function() { showPage('setup-page'); };
+window.showHome = function() {
+  stopTimer();
+  document.getElementById('round-result-overlay').classList.remove('show');
+  document.getElementById('winner-overlay').classList.remove('show');
+  loadHome();
+};
+
+let selectedLevel = 10;
+let totalCardsCount = 40;
+
+window.selectLevel = function(sec, el) {
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedLevel = sec;
+};
+
+window.changeCards = function(delta) {
+  totalCardsCount = Math.max(10, Math.min(200, totalCardsCount + delta));
+  document.getElementById('cards-count-val').textContent = totalCardsCount;
+};
+
+window.startGame = function() {
+  const p1 = document.getElementById('p1-name').value.trim() || 'لاعب 1';
+  const p2 = document.getElementById('p2-name').value.trim() || 'لاعب 2';
+  gameState = {
+    p1Name: p1, p2Name: p2,
+    p1Points: 0, p2Points: 0,
+    roundTime: selectedLevel,
+    totalCards: totalCardsCount,
+    cardsRemaining: totalCardsCount,
+    tableCards: 2,
+    round: 1,
+    paused: false,
+    started: false
+  };
+  renderGame();
+  showPage('game-page');
+  requestWakeLock();
+};
+
+// ── GAME LOGIC ──
+function renderGame() {
+  document.getElementById('game-p1-name').textContent = gameState.p1Name;
+  document.getElementById('game-p2-name').textContent = gameState.p2Name;
+  document.getElementById('p1-pts').textContent = gameState.p1Points;
+  document.getElementById('p2-pts').textContent = gameState.p2Points;
+  document.getElementById('p1-cards-won').textContent = gameState.p1Points + ' نقطة';
+  document.getElementById('p2-cards-won').textContent = gameState.p2Points + ' نقطة';
+  document.getElementById('round-num').textContent = gameState.round;
+  document.getElementById('table-cards-info').textContent = '🃏 ' + gameState.tableCards + ' على الطاولة';
+  document.getElementById('table-pts-badge').textContent = gameState.tableCards;
+  document.getElementById('timer-display').textContent = gameState.roundTime;
+  document.getElementById('rr-p1-btn').textContent = '🟢 ' + gameState.p1Name;
+  document.getElementById('rr-p2-btn').textContent = '🟠 ' + gameState.p2Name;
+  setTimerColor(gameState.roundTime, gameState.roundTime);
+  document.getElementById('timer-ring').style.strokeDashoffset = '0';
+  document.getElementById('ctrl-pre-start').style.display = 'block';
+  document.getElementById('ctrl-running').style.display = 'none';
+}
+
+window.beginRound = function() {
+  document.getElementById('ctrl-pre-start').style.display = 'none';
+  document.getElementById('ctrl-running').style.display = 'block';
+  runCountdown(3, () => startTimer());
+};
+
+function runCountdown(n, callback) {
+  const el = document.getElementById('countdown-display');
+  const timerEl = document.getElementById('timer-display');
+  el.style.display = 'flex';
+  timerEl.style.display = 'none';
+  el.textContent = n;
+  playBeep(800, 0.1);
+  countdownInterval = setInterval(() => {
+    n--;
+    if (n <= 0) {
+      clearInterval(countdownInterval);
+      el.style.display = 'none';
+      timerEl.style.display = 'flex';
+      callback();
+    } else {
+      el.textContent = n;
+      playBeep(800, 0.1);
+    }
+  }, 1000);
+}
+
+function startTimer() {
+  timerLeft = gameState.roundTime;
+  const total = gameState.roundTime;
+  const circumference = 276.46;
+  const ring = document.getElementById('timer-ring');
+  const display = document.getElementById('timer-display');
+  updateTimerDisplay(timerLeft, total);
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    updateTimerDisplay(timerLeft, total);
+    const offset = circumference * (1 - timerLeft / total);
+    ring.style.strokeDashoffset = offset;
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+      onTimeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(t, total) {
+  document.getElementById('timer-display').textContent = t;
+  setTimerColor(t, total);
+}
+
+function setTimerColor(t, total) {
+  const pct = t / total;
+  let color;
+  if (pct > 0.5) color = '#00e676';
+  else if (pct > 0.25) color = '#ffd600';
+  else color = '#ff1744';
+  document.documentElement.style.setProperty('--timer-color', color);
+  document.getElementById('timer-ring').style.stroke = color;
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  clearInterval(countdownInterval);
+}
+
+function onTimeUp() {
+  playWhistle();
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  showRoundResult();
+}
+
+window.pauseGame = function() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    document.getElementById('ctrl-running').innerHTML = '<button class="ctrl-btn btn-start" onclick="resumeGame()">▶ متابعة</button>';
+  }
+};
+
+window.resumeGame = function() {
+  document.getElementById('ctrl-running').innerHTML = '<button class="ctrl-btn btn-pause" onclick="pauseGame()">⏸ إيقاف مؤقت</button>';
+  const total = gameState.roundTime;
+  const circumference = 276.46;
+  const ring = document.getElementById('timer-ring');
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    updateTimerDisplay(timerLeft, total);
+    const offset = circumference * (1 - timerLeft / total);
+    ring.style.strokeDashoffset = offset;
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+      onTimeUp();
+    }
+  }, 1000);
+};
+
+function showRoundResult() {
+  document.getElementById('rr-pot').textContent = gameState.tableCards;
+  document.getElementById('round-result-overlay').classList.add('show');
+}
+
+window.awardRound = async function(winner) {
+  document.getElementById('round-result-overlay').classList.remove('show');
+  if (winner === 1) {
+    gameState.p1Points += gameState.tableCards;
+    gameState.cardsRemaining -= gameState.tableCards;
+    gameState.tableCards = 2;
+  } else if (winner === 2) {
+    gameState.p2Points += gameState.tableCards;
+    gameState.cardsRemaining -= gameState.tableCards;
+    gameState.tableCards = 2;
+  } else {
+    gameState.tableCards += 2;
+    gameState.cardsRemaining -= 2;
+  }
+  gameState.round++;
+  if (gameState.cardsRemaining <= 0) {
+    await endGame();
+    return;
+  }
+  renderGame();
+  document.getElementById('ctrl-pre-start').style.display = 'block';
+  document.getElementById('ctrl-running').style.display = 'none';
+};
+
+async function endGame() {
+  const p1 = gameState.p1Points;
+  const p2 = gameState.p2Points;
+  let winnerName, loserName;
+  let draw = false;
+  if (p1 > p2) { winnerName = gameState.p1Name; loserName = gameState.p2Name; }
+  else if (p2 > p1) { winnerName = gameState.p2Name; loserName = gameState.p1Name; }
+  else { winnerName = 'تعادل!'; draw = true; }
+  document.getElementById('winner-name').textContent = winnerName;
+  document.getElementById('winner-score-line').textContent = `${gameState.p1Name}: ${p1}  •  ${gameState.p2Name}: ${p2}`;
+  document.getElementById('winner-overlay').classList.add('show');
+  await saveMatch(winnerName, draw);
+}
+
+async function saveMatch(winnerName, draw) {
+  if (!currentUser) return;
+  try {
+    await addDoc(collection(db,'users',currentUser.uid,'matches'), {
+      p1Name: gameState.p1Name, p2Name: gameState.p2Name,
+      p1Points: gameState.p1Points, p2Points: gameState.p2Points,
+      winner: winnerName, totalRounds: gameState.round - 1,
+      createdAt: serverTimestamp()
+    });
+    const isWinner = (!draw) && (
+      (gameState.p1Points > gameState.p2Points && gameState.p1Name === currentUser.displayName) ||
+      (gameState.p2Points > gameState.p1Points && gameState.p2Name === currentUser.displayName)
+    );
+    await updateDoc(doc(db,'users',currentUser.uid), {
+      games: increment(1),
+      wins: isWinner ? increment(1) : increment(0),
+      totalPoints: increment(Math.max(gameState.p1Points, gameState.p2Points))
+    });
+  } catch(e) {}
+}
+
+window.rematch = function() {
+  gameState.p1Points = 0;
+  gameState.p2Points = 0;
+  gameState.round = 1;
+  gameState.tableCards = 2;
+  gameState.cardsRemaining = gameState.totalCards;
+  document.getElementById('winner-overlay').classList.remove('show');
+  renderGame();
+};
+
+// ── LEADERBOARD ──
+window.showLeaderboard = async function() {
+  showPage('leaderboard-page');
+  const content = document.getElementById('lb-content');
+  content.innerHTML = '<div class="no-games">جار التحميل...</div>';
+  try {
+    const q = query(collection(db,'users'), orderBy('wins','desc'), limit(20));
+    const snaps = await getDocs(q);
+    if (snaps.empty) { content.innerHTML = '<div class="no-games">لا يوجد لاعبون بعد</div>'; return; }
+    content.innerHTML = '';
+    let rank = 1;
+    snaps.forEach(d => {
+      const u = d.data();
+      const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+      const item = document.createElement('div');
+      item.className = 'lb-item';
+      item.innerHTML = `
+        <div class="lb-rank ${rankClass}">${rank}</div>
+        <div class="lb-info">
+          <div class="lb-name">${u.name || 'لاعب'}</div>
+          <div class="lb-stats">${u.games || 0} مباراة • ${u.wins || 0} انتصار</div>
+        </div>
+        <div class="lb-pts">${u.wins || 0}</div>
+      `;
+      content.appendChild(item);
+      rank++;
+    });
+  } catch(e) {
+    content.innerHTML = '<div class="no-games">تعذر تحميل البيانات</div>';
+  }
+};
+
+// ── AUDIO ──
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playBeep(freq, duration) {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(); osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+function playWhistle() {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(1800, ctx.currentTime + 0.1);
+    osc.frequency.linearRampToValueAtTime(1500, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start(); osc.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+// ── WAKE LOCK ──
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch(e) {}
+}
+
+// ── FULLSCREEN ──
+document.getElementById('game-page').addEventListener('dblclick', () => {
+  if (!document.fullscreenElement) {
+    document.getElementById('game-page').requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+});
+
+// init
+</script>
+</body>
+</html>
